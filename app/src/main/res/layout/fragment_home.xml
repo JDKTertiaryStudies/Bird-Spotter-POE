@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- CardView for the title and RecyclerView for bird observations -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/card_background">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="460dp"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/birdpaper">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="cursive"
+                    android:text="Bird Observations"
+                    android:textSize="30sp"
+                    android:textStyle="bold|italic" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/birdObservationRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:scrollbars="vertical" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- CardView for the Google MapView -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/card_background">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/birdpaper">
+
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/mapView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- CardView for the RecyclerView for hotspots -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/card_background"/>
+
+        <!-- Error View -->
+        <LinearLayout
+            android:id="@+id/errorView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="16dp"
+            android:background="@android:color/holo_red_light">
+
+            <TextView
+                android:id="@+id/errorMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unavailable"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/retryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Retry"
+                android:layout_marginTop="10dp"
+                android:textColor="@android:color/white"
+                android:background="@android:color/holo_blue_dark" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

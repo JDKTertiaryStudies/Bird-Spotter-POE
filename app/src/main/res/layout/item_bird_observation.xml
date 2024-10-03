@@ -1,0 +1,61 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/birdwallpaper">
+
+    <!-- Banner ImageView for the Bird Icon -->
+    <ImageView
+        android:id="@+id/birdBanner"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_bird"
+        android:contentDescription="Bird Banner" />
+
+    <TextView
+        android:id="@+id/birdComName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Common Name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/black"/>
+
+    <TextView
+        android:id="@+id/birdSciName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scientific Name"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/birdLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/birdObsDateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Observation Date and Time"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/birdUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Uploaded by"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/observationNotes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notes"
+        android:textSize="14sp" />
+</LinearLayout>

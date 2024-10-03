@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">BirdSpotter</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string-array name="bird_watcher_types">
+        <item>Hobbyist</item>
+        <item>Wildlife Photographer</item>
+        <item>Newbie/Beginner</item>
+        <item>Wildlife Magazine Social Media Content Creator</item>
+    </string-array>
+    <string-array name="bird_watching_duration">
+        <item>Less than a year</item>
+        <item>1 year</item>
+        <item>2-3 years</item>
+        <item>More than 3 years</item>
+    </string-array>
+    <string name="recaptcha_site_key">6LdqWDEqAAAAAMbpxvyVx0R89Jd75sMwoNsVJ91A</string>
+</resources>

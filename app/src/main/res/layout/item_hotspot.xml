@@ -1,0 +1,62 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/birdwallpaper">
+
+    <TextView
+        android:id="@+id/hotspotName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hotspot Name"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/hotspotLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/hotspotCoordinates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Coordinates"
+        android:textSize="14sp" />
+
+    <!-- New horizontal LinearLayout for Country and Region -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/hotspotCountry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Country"
+            android:textSize="14sp"
+            android:layout_weight="1"
+            android:paddingEnd="8dp" />
+
+        <TextView
+            android:id="@+id/hotspotRegion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Region"
+            android:textSize="14sp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/hotspotIsHotspot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hotspot"
+        android:textSize="14sp" />
+
+</LinearLayout>
