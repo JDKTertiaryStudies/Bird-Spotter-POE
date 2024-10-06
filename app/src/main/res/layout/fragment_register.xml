@@ -26,8 +26,9 @@
 
         <EditText
             android:id="@+id/nameInput"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
+            android:elevation="5dp"
             android:hint="Full Name"
             android:padding="16dp"
             android:background="@drawable/rounded_edittext_background"
@@ -36,8 +37,9 @@
 
         <EditText
             android:id="@+id/emailRegisterInput"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
+            android:elevation="5dp"
             android:hint="Email"
             android:padding="16dp"
             android:background="@drawable/rounded_edittext_background"
@@ -46,8 +48,9 @@
 
         <EditText
             android:id="@+id/passwordRegisterInput"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
+            android:elevation="5dp"
             android:hint="Password"
             android:padding="16dp"
             android:background="@drawable/rounded_edittext_background"
@@ -56,16 +59,18 @@
 
         <Spinner
             android:id="@+id/birdWatcherTypeSpinner"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_edittext_background"
+            android:elevation="14dp"
             android:layout_marginBottom="16dp"/>
 
         <Spinner
             android:id="@+id/birdWatchingDurationSpinner"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_edittext_background"
+            android:elevation="14dp"
             android:layout_marginBottom="16dp"/>
 
         <EditText

@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#808080</color>
     <color name="route_color">#FF5722</color>
+    <color name="primary">#3F51B5</color>
+    <color name="primaryDark">#303F9F</color>
 </resources>
