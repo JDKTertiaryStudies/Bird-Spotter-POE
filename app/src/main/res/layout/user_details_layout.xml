@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile_pic_4" />
+
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Name"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/userBirdWatcherType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bird Watcher Type"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/userBirdWatchingExperience"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Experience"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/userLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/logoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+</LinearLayout>
