@@ -51,6 +51,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private val EBIRD_API_KEY = "iui6vsljmcjt"
     private val hotspots = mutableListOf<BirdHotspot>()
+    private val observations = mutableListOf<BirdObservation>()
     private var distanceRadius = 10.0 // Default radius in kilometers
 
     private val okHttpClient by lazy { OkHttpClient() }
@@ -123,6 +124,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 location?.let {
                     viewLifecycleOwner.lifecycleScope.launch {
                         val regionCode = getRegionCode(it.latitude, it.longitude)
+                        fetchObservations(regionCode, it.latitude, it.longitude)
                         fetchHotspots(regionCode, it.latitude, it.longitude)
                         setupMap(it.latitude, it.longitude)
                     }
@@ -146,6 +148,38 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private suspend fun fetchObservations(regionCode: String, lat: Double, lon: Double) {
+        val url = "https://api.ebird.org/v2/ref/obs/${regionCode}?lat=$lat&lng=$lon&key=$EBIRD_API_KEY"
+        Log.d("HomeFragment", "Fetching observations with URL: $url")
+
+        try {
+            val request = Request.Builder().url(url).get().build()
+
+            val response = withContext(Dispatchers.IO) {
+                okHttpClient.newCall(request).execute()
+            }
+
+            if (response.isSuccessful) {
+                val body = response.body?.string()
+                if (body != null && body.isNotEmpty()) {
+                    val observationList = parseObservations(body, lat, lon).take(10)
+                    withContext(Dispatchers.Main) {
+                        observations.clear()
+                        observations.addAll(observationList)
+                        displayObservationsOnMap(observationList)
+                    }
+                } else {
+                    showError("No observations found in this location.")
+                }
+            } else {
+                throw Exception("Failed to fetch observations: ${response.message}")
+            }
+        } catch (e: Exception) {
+            Log.e("HomeFragment", "Error fetching observations", e)
+            showError("Error fetching observations. Please try again.")
+        }
+    }
+
     private suspend fun fetchHotspots(regionCode: String, lat: Double, lon: Double) {
         val url = "https://api.ebird.org/v2/ref/hotspot/${regionCode}?lat=$lat&lng=$lon&key=$EBIRD_API_KEY"
         Log.d("HomeFragment", "Fetching hotspots with URL: $url")
@@ -162,6 +196,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 if (body != null && body.isNotEmpty()) {
                     val hotspotList = parseHotspots(body, lat, lon).take(10)
                     withContext(Dispatchers.Main) {
+                        hotspots.clear()
+                        hotspots.addAll(hotspotList)
                         displayHotspotsOnMap(hotspotList)
                     }
                 } else {
@@ -174,6 +210,27 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             Log.e("HomeFragment", "Error fetching hotspots", e)
             showError("Error fetching hotspots. Please try again.")
         }
+    }
+
+    private fun parseObservations(responseData: String, lat: Double, lon: Double): List<BirdObservation> {
+        val jsonArray = JSONArray(responseData)
+        val observationList = mutableListOf<BirdObservation>()
+
+        for (i in 0 until jsonArray.length()) {
+            val observationJson = jsonArray.getJSONObject(i)
+
+            val speciesName = observationJson.optString("speciesName", "Unknown Species")
+            val latitude = observationJson.optDouble("latitude", 0.0)
+            val longitude = observationJson.optDouble("longitude", 0.0)
+
+            val distance = calculateDistance(lat, lon, latitude, longitude)
+            if (distance <= distanceRadius) {
+                val observation = BirdObservation(speciesName, latitude, longitude, distance)
+                observationList.add(observation)
+            }
+        }
+
+        return observationList
     }
 
     private fun parseHotspots(responseData: String, lat: Double, lon: Double): List<BirdHotspot> {
@@ -204,6 +261,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val results = FloatArray(1)
         Location.distanceBetween(lat1, lon1, lat2, lon2, results)
         return (results[0] / 1000.0).roundToInt().toDouble() // Convert to kilometers and round
+    }
+
+    private fun displayObservationsOnMap(observationList: List<BirdObservation>) {
+        googleMap?.let { map ->
+            observationList.forEach { observation ->
+                val position = LatLng(observation.latitude, observation.longitude)
+                map.addMarker(
+                    MarkerOptions()
+                        .position(position)
+                        .title(observation.speciesName)
+                        .snippet("Observation within ${observation.distance} km")
+                )
+            }
+        }
     }
 
     private fun displayHotspotsOnMap(hotspotList: List<BirdHotspot>) {
@@ -338,6 +409,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val longitude: Double,
         val countryName: String,
         val subnational1Name: String,
+        val distance: Double
+    )
+
+    data class BirdObservation(
+        val speciesName: String,
+        val latitude: Double,
+        val longitude: Double,
         val distance: Double
     )
 }
