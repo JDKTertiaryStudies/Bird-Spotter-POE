@@ -10,6 +10,7 @@ import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,6 +59,7 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
     private var selectedImageUri: Uri? = null
     private var currentLocation: Location? = null
+    private var currentLocationAddress: String? = null
 
     private val CHANNEL_ID = "Profile_Load_Error"
     private val REGISTRATION_CHANNEL_ID = "Registration_Success"
@@ -84,7 +86,7 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         if (currentUser == null) {
             displayLoginForm()
         } else {
-            displayUserProfile()
+            displayUserProfile() // Load user profile first, then fetch location
         }
 
         setupMapView(savedInstanceState)
@@ -119,20 +121,34 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
             googleMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
             Toast.makeText(requireContext(), "Switched to 3D View", Toast.LENGTH_SHORT).show()
         }
+
+        binding.searchButton.setOnClickListener {
+            searchAndAddHotspot(binding.searchInput.text.toString().trim())
+        }
     }
 
     private fun setupToggleButtons() {
         binding.userDetailsToggle.setOnClickListener {
+            setSelectedToggle(binding.userDetailsToggle)
             displayUserProfile()
         }
 
         binding.formDetailsToggle.setOnClickListener {
+            setSelectedToggle(binding.formDetailsToggle)
             displayAddBirdForm()
         }
 
         binding.birdObservationsToggle.setOnClickListener {
+            setSelectedToggle(binding.birdObservationsToggle)
             displayBirdObservationList()
         }
+    }
+
+    private fun setSelectedToggle(selectedToggle: TextView) {
+        binding.userDetailsToggle.setBackgroundResource(R.drawable.toggle_unselected)
+        binding.formDetailsToggle.setBackgroundResource(R.drawable.toggle_unselected)
+        binding.birdObservationsToggle.setBackgroundResource(R.drawable.toggle_unselected)
+        selectedToggle.setBackgroundResource(R.drawable.toggle_selected)
     }
 
     private fun requestAllPermissions() {
@@ -171,7 +187,7 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(requireActivity(), permissionsToRequest.toTypedArray(), 1)
         } else {
-            getUserLocation()
+            getUserLocation() // Fetch the user's location if all permissions are granted
         }
     }
 
@@ -181,13 +197,76 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                currentLocation = location
                 if (location != null) {
+                    currentLocation = location
+                    val userLatLng = LatLng(location.latitude, location.longitude)
+
+                    // Convert the location to a human-readable address
+                    lifecycleScope.launch {
+                        currentLocationAddress = getAddressFromCoordinates(location.latitude, location.longitude)
+                        // Now update the profile with the address without "Location: " prefix
+                        updateProfileWithAddress(currentLocationAddress)
+                    }
+
+                    // Zoom the map to the user's location
+                    googleMap?.moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom(userLatLng, 15f))
+
                     Toast.makeText(requireContext(), "Location retrieved: ${location.latitude}, ${location.longitude}", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(requireContext(), "Unable to retrieve location", Toast.LENGTH_SHORT).show()
                 }
+            }.addOnFailureListener {
+                Toast.makeText(requireContext(), "Error retrieving location", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private suspend fun getAddressFromCoordinates(lat: Double, lon: Double): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                val addresses = geocoder.getFromLocation(lat, lon, 1)
+                if (addresses?.isNotEmpty() == true) {
+                    addresses[0].getAddressLine(0)
+                } else {
+                    "Unknown Location"
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                "Unknown Location"
+            }
+        }
+    }
+
+    private fun updateProfileWithAddress(address: String?) {
+        // Update the TextView in the profile with the address without the "Location: " prefix
+        binding.sectionContent.findViewById<TextView>(R.id.userLocation)?.text = address ?: "Unknown"
+    }
+
+    private fun searchAndAddHotspot(searchQuery: String) {
+        if (searchQuery.isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter a location or coordinates.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+
+        try {
+            val addresses = geocoder.getFromLocationName(searchQuery, 1)
+            if (addresses != null && addresses.isNotEmpty()) {
+                val address = addresses[0]
+                val latLng = LatLng(address.latitude, address.longitude)
+
+                googleMap?.addMarker(MarkerOptions().position(latLng).title("Favorite Hotspot"))
+                googleMap?.animateCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom(latLng, 12f))
+
+                Toast.makeText(requireContext(), "Hotspot added at: ${address.getAddressLine(0)}", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Location not found. Please try again.", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(requireContext(), "Failed to get location.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -333,40 +412,23 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         userName.text = document.getString("name")
-                        birdWatcherType.text = "Bird Watcher Type: ${document.getString("birdWatcherType") ?: "Enthusiast"}"
-                        experience.text = "Experience: ${document.getString("experience") ?: "Beginner"}"
+                        birdWatcherType.text = "${document.getString("birdWatcherType") ?: "Enthusiast"}"
+                        experience.text = "${document.getString("experience") ?: "Beginner"}"
 
                         currentUser?.photoUrl?.let {
                             Glide.with(this).load(it).into(profileImage)
                         }
 
-                        lifecycleScope.launch {
-                            try {
-                                withTimeout(5000) {
-                                    val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                                    val addresses = withContext(Dispatchers.IO) {
-                                        geocoder.getFromLocationName("Cape Town", 1)
-                                    }
-                                    if (addresses?.isNotEmpty() == true) {
-                                        val address = addresses[0]
-                                        locationTextView.text = "Location: ${address.locality}, ${address.countryName}"
-                                    } else {
-                                        locationTextView.text = "Location: Unknown"
-                                    }
-                                }
-                            } catch (e: IOException) {
-                                locationTextView.text = "Location: Unknown"
-                                e.printStackTrace()
-                            } catch (e: Exception) {
-                                locationTextView.text = "Location: Unknown"
-                                e.printStackTrace()
-                            }
-                        }
-
+                        // Display "Pending..." until location is updated
+                        locationTextView.text = "Pending..."
                         logoutButton.visibility = View.VISIBLE
+
                         logoutButton.setOnClickListener {
                             showLogoutBottomSheet()
                         }
+
+                        // Fetch the user's location after loading the profile
+                        getUserLocation()
                     } else {
                         showProfileLoadErrorNotification()
                     }
@@ -398,14 +460,17 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
 
         submitBirdButton.setOnClickListener {
             val birdName = birdNameInput.text.toString().trim()
-            val birdNotes = birdNotesInput.text.toString().trim()
+            var birdNotes = birdNotesInput.text.toString().trim()
 
             if (birdName.isNotEmpty() && birdNotes.isNotEmpty()) {
-                if (currentUser != null) {
+                if (currentUser != null && currentLocationAddress != null) {
+                    // Append location address two spaces below the notes
+                    birdNotes += "\n\nObserved at: $currentLocationAddress"
+
                     val birdData = hashMapOf(
                         "birdName" to birdName,
                         "notes" to birdNotes,
-                        "location" to (currentLocation?.let { "${it.latitude}, ${it.longitude}" } ?: "Unknown"),
+                        "location" to currentLocationAddress,
                         "userId" to currentUser!!.uid,
                         "timestamp" to System.currentTimeMillis()
                     )
@@ -581,6 +646,7 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
+        getUserLocation() // Get user location after map is ready
 
         googleMap?.setOnMapClickListener { latLng ->
             if (currentUser != null) {

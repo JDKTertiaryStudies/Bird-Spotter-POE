@@ -1,61 +1,102 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@drawable/birdwallpaper">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    android:elevation="8dp"
+    app:cardCornerRadius="16dp">
 
-    <!-- Banner ImageView for the Bird Icon -->
-    <ImageView
-        android:id="@+id/birdBanner"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_bird"
-        android:contentDescription="Bird Banner" />
-
-    <TextView
-        android:id="@+id/birdComName"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Common Name"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/black"/>
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/birdSciName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scientific Name"
-        android:textSize="14sp" />
+        <!-- Top section with bird information -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_blue_dark"
+            android:padding="16dp"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/birdLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Location"
-        android:textSize="14sp" />
+            <!-- Bird Common Name -->
+            <TextView
+                android:id="@+id/birdComName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Common Name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white" />
 
-    <TextView
-        android:id="@+id/birdObsDateTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Observation Date and Time"
-        android:textSize="14sp" />
+            <!-- Bird Scientific Name -->
+            <TextView
+                android:id="@+id/birdSciName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Scientific Name"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp" />
 
-    <TextView
-        android:id="@+id/birdUser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Uploaded by"
-        android:textSize="14sp" />
+            <!-- Horizontal layout for Location and Observation Date and Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
 
-    <TextView
-        android:id="@+id/observationNotes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Notes"
-        android:textSize="14sp" />
-</LinearLayout>
+                <!-- Bird Location -->
+                <TextView
+                    android:id="@+id/birdLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Location"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white" />
+
+                <!-- Observation DateTime -->
+                <TextView
+                    android:id="@+id/birdObsDateTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Observation DateTime"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:layout_gravity="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Bottom section with image and additional details -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_blue_light"
+            android:padding="8dp"
+            android:orientation="vertical">
+
+            <!-- Bird Image -->
+            <ImageView
+                android:id="@+id/birdBanner"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_bird"
+                android:contentDescription="Bird Banner"
+                android:layout_marginTop="8dp" />
+
+            <!-- Notes about the observation -->
+            <TextView
+                android:id="@+id/observationNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Notes"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

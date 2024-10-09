@@ -1,59 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="8dp"
-    android:elevation="4dp"
+    android:elevation="8dp"
     app:cardCornerRadius="16dp">
 
+    <!-- Two-tone background color -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/birdName"
+        <!-- Top half with a darker color -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Bird Name"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:background="@android:color/holo_blue_dark"
+            android:padding="16dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/birdNotes"
+            <TextView
+                android:id="@+id/birdName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bird Name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/birdNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Notes"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Location"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp"/>
+
+        </LinearLayout>
+
+        <!-- Bottom half with a lighter color and the image -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Notes"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+            android:background="@android:color/holo_blue_light"
+            android:padding="8dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Location"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+            <ImageView
+                android:id="@+id/birdImageView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"/>
 
-        <ImageView
-            android:id="@+id/birdImageView"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="centerCrop"
-            android:visibility="gone"/>
+            <!-- Delete Icon -->
+            <ImageView
+                android:id="@+id/deleteIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="Delete Bird Observation"
+                android:tint="@color/white"
+                android:layout_marginTop="8dp"
+                tools:ignore="UseAppTint" />
 
-        <!-- Delete Icon -->
-        <ImageView
-            android:id="@+id/deleteIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="end"
-            android:src="@drawable/ic_delete"
-            android:contentDescription="Delete Bird Observation"
-            android:layout_marginTop="8dp"/>
-
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

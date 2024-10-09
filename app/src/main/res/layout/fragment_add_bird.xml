@@ -1,77 +1,135 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/addBirdTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Bird Observation"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp" />
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_margin="8dp"
+        android:elevation="8dp"
+        app:cardCornerRadius="16dp">
 
-    <!-- Bird Name Input -->
-    <EditText
-        android:id="@+id/birdNameInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Bird Name"
-        android:inputType="text"
-        android:background="@drawable/rounded_edittext_background"
-        android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/addBirdTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp" />
+        <!-- Two-tone background color -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <!-- Bird Notes Input -->
-    <EditText
-        android:id="@+id/birdNotesInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Notes"
-        android:inputType="textMultiLine"
-        android:background="@drawable/rounded_edittext_background"
-        android:padding="12dp"
-        android:minLines="3"
-        app:layout_constraintTop_toBottomOf="@id/birdNameInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp" />
+            <!-- Top half with a darker color -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/blue_unselected"
+                android:padding="16dp"
+                android:orientation="vertical">
 
-    <!-- Select Image Button -->
-    <Button
-        android:id="@+id/selectImageButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Select Image"
-        android:textColor="@android:color/white"
-        android:background="@drawable/outdented_button_background"
-        app:layout_constraintTop_toBottomOf="@id/birdNotesInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp" />
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/addBirdTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Bird Observation"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="16dp" />
 
-    <!-- Submit Button -->
-    <Button
-        android:id="@+id/submitBirdButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Submit"
-        android:textColor="@android:color/white"
-        android:background="@drawable/outdented_button_background"
-        app:layout_constraintTop_toBottomOf="@id/selectImageButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+                <!-- Bird Name Input -->
+                <EditText
+                    android:id="@+id/birdNameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Bird Name"
+                    android:inputType="text"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:padding="12dp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginBottom="16dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- Bird Notes Input -->
+                <EditText
+                    android:id="@+id/birdNotesInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Notes"
+                    android:inputType="textMultiLine"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:padding="12dp"
+                    android:textColor="@android:color/white"
+                    android:minLines="3"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
+
+            <!-- Bottom half with a lighter color for image and buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:orientation="vertical">
+
+                <!-- Select Image Button -->
+                <Button
+                    android:id="@+id/selectImageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select Image"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/outdented_button_background"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- ImageView (hidden until an image is selected) -->
+                <ImageView
+                    android:id="@+id/birdImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="8dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+                <!-- Buttons layout (evenly spaced) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:weightSum="3">
+
+                    <!-- Submit Button -->
+                    <Button
+                        android:id="@+id/submitBirdButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Submit"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/outdented_button_background"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- Clear Button (example for reset action) -->
+                    <Button
+                        android:id="@+id/clearButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Clear"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/outdented_button_background"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- Cancel Button -->
+                    <Button
+                        android:id="@+id/cancelButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Cancel"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/outdented_button_background" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</ScrollView>

@@ -2,43 +2,34 @@ package com.example.birdspotter.ui.home
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.birdspotter.R
 import com.example.birdspotter.databinding.FragmentHomeBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
-import com.google.maps.DirectionsApi
-import com.google.maps.GeoApiContext
-import com.google.maps.model.DirectionsResult
-import com.google.maps.model.LatLng as GMapsLatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
-import java.util.*
-import kotlin.math.roundToInt
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -50,20 +41,24 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
 
     private val EBIRD_API_KEY = "iui6vsljmcjt"
-    private val hotspots = mutableListOf<BirdHotspot>()
-    private val observations = mutableListOf<BirdObservation>()
-    private var distanceRadius = 10.0 // Default radius in kilometers
+    private val okHttpClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+    }
 
-    private val okHttpClient by lazy { OkHttpClient() }
+    private var distanceRadius = 50.0 // Default radius
+    private var currentHotspotLimit = 10 // Initial limit of hotspots
 
-    // Permissions request launcher using ActivityResultContracts
+    // Permissions request launcher
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
             fetchAllData()
         } else {
-            showError("Location permissions are required to display bird hotspots.")
+            showError("Location permissions are required to display bird observations.")
         }
     }
 
@@ -78,6 +73,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+        // Set up RecyclerView for observations
+        binding.birdObservationRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Set up buttons to adjust hotspot radius
+        setupHotspotRangeButtons()
 
         // Check permissions and load data
         if (hasAllPermissions()) {
@@ -95,12 +96,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         _binding = null
     }
 
+    // Check if location permission is granted
     private fun hasAllPermissions(): Boolean {
         return ContextCompat.checkSelfPermission(
             requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    // Request location permissions
     private fun requestPermissions() {
         permissionLauncher.launch(
             arrayOf(
@@ -110,6 +113,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
+    // Fetch user location and initiate data fetching
     private fun fetchAllData() {
         getUserLocation()
     }
@@ -123,10 +127,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val regionCode = getRegionCode(it.latitude, it.longitude)
-                        fetchObservations(regionCode, it.latitude, it.longitude)
-                        fetchHotspots(regionCode, it.latitude, it.longitude)
-                        setupMap(it.latitude, it.longitude)
+                        val lat = it.latitude
+                        val lon = it.longitude
+                        fetchRawObservations(lat, lon) // Fetch raw data
+                        fetchRawHotspots(lat, lon) // Fetch raw data
+                        setupMap(lat, lon)
                     }
                 } ?: showError("Unable to retrieve location. Please ensure location services are enabled.")
             }.addOnFailureListener {
@@ -135,25 +140,41 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private suspend fun getRegionCode(lat: Double, lon: Double): String {
-        return withContext(Dispatchers.IO) {
-            try {
-                val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                val addressList = geocoder.getFromLocation(lat, lon, 1)
-                addressList?.firstOrNull()?.countryCode ?: "ZA"
-            } catch (e: Exception) {
-                Log.e("HomeFragment", "Geocoder error: ${e.message}", e)
-                "ZA"
+    // Setup buttons for increasing/decreasing the radius and hotspot limit
+    private fun setupHotspotRangeButtons() {
+        val increaseButton = binding.increaseRadiusButton
+        val decreaseButton = binding.decreaseRadiusButton
+
+        increaseButton.setOnClickListener {
+            distanceRadius += 50
+            currentHotspotLimit += 10 // Increase hotspot limit by 10
+            fetchAllData() // Refresh hotspots with the new radius and limit
+            Toast.makeText(requireContext(), "Radius increased to ${distanceRadius}km, showing up to $currentHotspotLimit hotspots", Toast.LENGTH_SHORT).show()
+        }
+
+        decreaseButton.setOnClickListener {
+            if (distanceRadius > 50) {
+                distanceRadius -= 50
+                currentHotspotLimit = maxOf(10, currentHotspotLimit - 10) // Decrease hotspot limit but keep it above 10
+                fetchAllData() // Refresh hotspots with the new radius and limit
+                Toast.makeText(requireContext(), "Radius decreased to ${distanceRadius}km, showing up to $currentHotspotLimit hotspots", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Cannot decrease radius below 50km", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private suspend fun fetchObservations(regionCode: String, lat: Double, lon: Double) {
-        val url = "https://api.ebird.org/v2/ref/obs/${regionCode}?lat=$lat&lng=$lon&key=$EBIRD_API_KEY"
+    // Fetch raw bird observations data
+    private suspend fun fetchRawObservations(lat: Double, lon: Double) {
+        val url = "https://api.ebird.org/v2/data/obs/geo/recent?lat=$lat&lng=$lon&sort=species"
         Log.d("HomeFragment", "Fetching observations with URL: $url")
 
         try {
-            val request = Request.Builder().url(url).get().build()
+            val request = Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("X-eBirdApiToken", EBIRD_API_KEY)
+                .build()
 
             val response = withContext(Dispatchers.IO) {
                 okHttpClient.newCall(request).execute()
@@ -161,16 +182,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
             if (response.isSuccessful) {
                 val body = response.body?.string()
-                if (body != null && body.isNotEmpty()) {
-                    val observationList = parseObservations(body, lat, lon).take(10)
-                    withContext(Dispatchers.Main) {
-                        observations.clear()
-                        observations.addAll(observationList)
-                        displayObservationsOnMap(observationList)
-                    }
-                } else {
-                    showError("No observations found in this location.")
-                }
+                body?.let {
+                    parseAndDisplayObservations(it) // Parse and display observations
+                } ?: showError("No observations found in this location.")
             } else {
                 throw Exception("Failed to fetch observations: ${response.message}")
             }
@@ -180,12 +194,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private suspend fun fetchHotspots(regionCode: String, lat: Double, lon: Double) {
-        val url = "https://api.ebird.org/v2/ref/hotspot/${regionCode}?lat=$lat&lng=$lon&key=$EBIRD_API_KEY"
+    // Fetch raw bird hotspots data
+    private suspend fun fetchRawHotspots(lat: Double, lon: Double) {
+        val url = "https://api.ebird.org/v2/ref/hotspot/geo?lat=$lat&lng=$lon"
         Log.d("HomeFragment", "Fetching hotspots with URL: $url")
 
         try {
-            val request = Request.Builder().url(url).get().build()
+            val request = Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("X-eBirdApiToken", EBIRD_API_KEY)
+                .build()
 
             val response = withContext(Dispatchers.IO) {
                 okHttpClient.newCall(request).execute()
@@ -193,17 +212,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
             if (response.isSuccessful) {
                 val body = response.body?.string()
-                if (body != null && body.isNotEmpty()) {
-                    val hotspotList = parseHotspots(body, lat, lon).take(10)
-                    withContext(Dispatchers.Main) {
-                        hotspots.clear()
-                        hotspots.addAll(hotspotList)
-                        displayHotspotsOnMap(hotspotList)
-                    }
-                } else {
-                    showError("No hotspots found in this location.")
-                }
+                Log.d("HomeFragment", "Hotspot response: $body") // Log the raw response
+
+                body?.let {
+                    parseAndDisplayHotspots(it) // Parse and display hotspots
+                } ?: showError("No hotspots found in this location.")
             } else {
+                Log.e("HomeFragment", "Failed to fetch hotspots: ${response.code} - ${response.message}")
                 throw Exception("Failed to fetch hotspots: ${response.message}")
             }
         } catch (e: Exception) {
@@ -212,173 +227,117 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun parseObservations(responseData: String, lat: Double, lon: Double): List<BirdObservation> {
+    // Parse and display bird observations
+    private suspend fun parseAndDisplayObservations(rawData: String) {
+        val observationList = parseObservations(rawData)
+        withContext(Dispatchers.Main) {
+            displayObservations(observationList) // Update UI with parsed data
+        }
+    }
+
+    // Parse and display bird hotspots
+    private suspend fun parseAndDisplayHotspots(rawData: String) {
+        val hotspotList = parseHotspots(rawData)
+        val limitedHotspotList = hotspotList.take(currentHotspotLimit) // Limit the number of displayed hotspots
+        withContext(Dispatchers.Main) {
+            displayHotspotsOnMap(limitedHotspotList) // Update UI with limited hotspots
+        }
+    }
+
+    // Parse JSON response for bird observations
+    private fun parseObservations(responseData: String): List<BirdObservation> {
         val jsonArray = JSONArray(responseData)
         val observationList = mutableListOf<BirdObservation>()
 
         for (i in 0 until jsonArray.length()) {
             val observationJson = jsonArray.getJSONObject(i)
 
-            val speciesName = observationJson.optString("speciesName", "Unknown Species")
-            val latitude = observationJson.optDouble("latitude", 0.0)
-            val longitude = observationJson.optDouble("longitude", 0.0)
+            val speciesCode = observationJson.optString("speciesCode", "")
+            val commonName = observationJson.optString("comName", "Unknown")
+            val scientificName = observationJson.optString("sciName", "Unknown")
+            val location = observationJson.optString("locName", "Unknown Location")
+            val observationDateTime = observationJson.optString("obsDt", "Unknown Date")
+            val latitude = observationJson.optDouble("lat", 0.0)
+            val longitude = observationJson.optDouble("lng", 0.0)
 
-            val distance = calculateDistance(lat, lon, latitude, longitude)
-            if (distance <= distanceRadius) {
-                val observation = BirdObservation(speciesName, latitude, longitude, distance)
-                observationList.add(observation)
-            }
+            val observation = BirdObservation(
+                speciesCode = speciesCode,
+                commonName = commonName,
+                scientificName = scientificName,
+                location = location,
+                observationDateTime = observationDateTime,
+                latitude = latitude,
+                longitude = longitude
+            )
+            observationList.add(observation)
         }
-
         return observationList
     }
 
-    private fun parseHotspots(responseData: String, lat: Double, lon: Double): List<BirdHotspot> {
-        val jsonArray = JSONArray(responseData)
+    // Parse the CSV-like response for bird hotspots
+    private fun parseHotspots(responseData: String): List<BirdHotspot> {
         val hotspotList = mutableListOf<BirdHotspot>()
 
-        for (i in 0 until jsonArray.length()) {
-            val hotspotJson = jsonArray.getJSONObject(i)
+        // Split the response by lines
+        val lines = responseData.trim().split("\n")
 
-            val locId = hotspotJson.optString("locId", "Unknown")
-            val name = hotspotJson.optString("name", "Unnamed Location")
-            val latitude = hotspotJson.optDouble("latitude", 0.0)
-            val longitude = hotspotJson.optDouble("longitude", 0.0)
-            val countryName = hotspotJson.optString("countryName", "Unknown Country")
-            val subnational1Name = hotspotJson.optString("subnational1Name", "Unknown Region")
+        for (line in lines) {
+            // Split each line by commas
+            val fields = line.split(",")
 
-            val distance = calculateDistance(lat, lon, latitude, longitude)
-            if (distance <= distanceRadius) {
-                val hotspot = BirdHotspot(locId, name, latitude, longitude, countryName, subnational1Name, distance)
+            // Ensure there are enough fields in the line to avoid IndexOutOfBoundsException
+            if (fields.size >= 6) {
+                val locId = fields[0].trim() // Location ID
+                val name = fields[6].trim() // Location name
+                val latitude = fields[4].toDoubleOrNull() ?: 0.0 // Latitude
+                val longitude = fields[5].toDoubleOrNull() ?: 0.0 // Longitude
+
+                // Create a BirdHotspot object
+                val hotspot = BirdHotspot(
+                    locId = locId,
+                    name = name,
+                    latitude = latitude,
+                    longitude = longitude
+                )
                 hotspotList.add(hotspot)
+            } else {
+                Log.e("HomeFragment", "Invalid data format in line: $line")
             }
         }
 
         return hotspotList
     }
 
-    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val results = FloatArray(1)
-        Location.distanceBetween(lat1, lon1, lat2, lon2, results)
-        return (results[0] / 1000.0).roundToInt().toDouble() // Convert to kilometers and round
+    // Display bird observations in the RecyclerView
+    private fun displayObservations(observationList: List<BirdObservation>) {
+        val adapter = BirdObservationAdapter(observationList)
+        binding.birdObservationRecyclerView.adapter = adapter
     }
 
-    private fun displayObservationsOnMap(observationList: List<BirdObservation>) {
-        googleMap?.let { map ->
-            observationList.forEach { observation ->
-                val position = LatLng(observation.latitude, observation.longitude)
-                map.addMarker(
-                    MarkerOptions()
-                        .position(position)
-                        .title(observation.speciesName)
-                        .snippet("Observation within ${observation.distance} km")
-                )
-            }
-        }
-    }
-
+    // Display bird hotspots on the map
     private fun displayHotspotsOnMap(hotspotList: List<BirdHotspot>) {
         googleMap?.let { map ->
             hotspotList.forEach { hotspot ->
                 val position = LatLng(hotspot.latitude, hotspot.longitude)
-                val marker = map.addMarker(
+                map.addMarker(
                     MarkerOptions()
                         .position(position)
                         .title(hotspot.name)
-                        .snippet("${hotspot.subnational1Name}, ${hotspot.countryName}")
                 )
-                marker?.tag = hotspot
             }
-        }
-
-        googleMap?.setOnMarkerClickListener { marker ->
-            val hotspot = marker.tag as? BirdHotspot
-            marker.showInfoWindow()
-            if (hotspot != null) {
-                fetchDirectionsToHotspot(LatLng(hotspot.latitude, hotspot.longitude))
-            }
-            true
         }
     }
 
+    // Setup the map with user location
     private fun setupMap(userLat: Double, userLon: Double) {
         googleMap?.let { map ->
             val userLocation = LatLng(userLat, userLon)
             map.uiSettings.isZoomControlsEnabled = true
-            map.uiSettings.isMyLocationButtonEnabled = true
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10f))
-
-            map.setOnMapClickListener { destination ->
-                fetchDirectionsToHotspot(destination)
-            }
         }
     }
 
-    private fun fetchDirectionsToHotspot(destination: LatLng) {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Show a notification message to the user
-            Toast.makeText(requireContext(), "Location permissions are required to access this feature.", Toast.LENGTH_LONG).show()
-
-            // Request the permissions again
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-            return
-        }
-
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                val userLatLng = LatLng(location.latitude, location.longitude)
-
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val context = GeoApiContext.Builder()
-                        .apiKey("YOUR_GOOGLE_MAPS_API_KEY")
-                        .build()
-
-                    try {
-                        val result: DirectionsResult = DirectionsApi.newRequest(context)
-                            .origin(GMapsLatLng(userLatLng.latitude, userLatLng.longitude))
-                            .destination(GMapsLatLng(destination.latitude, destination.longitude))
-                            .await()
-
-                        withContext(Dispatchers.Main) {
-                            drawRoute(result)
-                        }
-                    } catch (e: Exception) {
-                        Log.e("HomeFragment", "Directions API error: ${e.message}", e)
-                        withContext(Dispatchers.Main) {
-                            showError("Unable to get directions. Please try again.")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun drawRoute(result: DirectionsResult) {
-        val path = result.routes[0].overviewPolyline.decodePath().map {
-            LatLng(it.lat, it.lng)
-        }
-        googleMap?.addPolyline(PolylineOptions().addAll(path).color(ContextCompat.getColor(requireContext(), R.color.route_color)))
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(calculateLatLngBounds(path), 100))
-    }
-
-    private fun calculateLatLngBounds(path: List<LatLng>): LatLngBounds {
-        val builder = LatLngBounds.Builder()
-        path.forEach { builder.include(it) }
-        return builder.build()
-    }
-
+    // Show error message
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
@@ -402,20 +361,48 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         mapView.onLowMemory()
     }
 
+    data class BirdObservation(
+        val speciesCode: String,
+        val commonName: String,
+        val scientificName: String,
+        val location: String,
+        val observationDateTime: String,
+        val latitude: Double,
+        val longitude: Double
+    )
+
     data class BirdHotspot(
         val locId: String,
         val name: String,
         val latitude: Double,
-        val longitude: Double,
-        val countryName: String,
-        val subnational1Name: String,
-        val distance: Double
+        val longitude: Double
     )
 
-    data class BirdObservation(
-        val speciesName: String,
-        val latitude: Double,
-        val longitude: Double,
-        val distance: Double
-    )
+    // Adapter for RecyclerView
+    class BirdObservationAdapter(private val observationList: List<BirdObservation>) :
+        RecyclerView.Adapter<BirdObservationAdapter.ViewHolder>() {
+
+        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val commonName: TextView = view.findViewById(R.id.birdComName)
+            val scientificName: TextView = view.findViewById(R.id.birdSciName)
+            val location: TextView = view.findViewById(R.id.birdLocation)
+            val observationDateTime: TextView = view.findViewById(R.id.birdObsDateTime)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_bird_observation, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val observation = observationList[position]
+            holder.commonName.text = observation.commonName
+            holder.scientificName.text = observation.scientificName
+            holder.location.text = observation.location
+            holder.observationDateTime.text = observation.observationDateTime
+        }
+
+        override fun getItemCount(): Int = observationList.size
+    }
 }
