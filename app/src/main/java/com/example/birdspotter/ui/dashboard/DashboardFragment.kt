@@ -315,12 +315,37 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         val passwordInput = registerView.findViewById<EditText>(R.id.passwordRegisterInput)
         val registerButton = registerView.findViewById<Button>(R.id.submitRegisterButton)
 
+        val birdWatcherTypeSpinner = registerView.findViewById<Spinner>(R.id.birdWatcherTypeSpinner)
+        val birdWatchingDurationSpinner = registerView.findViewById<Spinner>(R.id.birdWatchingDurationSpinner)
+
+        // Set up the Bird Watcher Type Spinner with default selection
+        val birdWatcherTypes = listOf("Select Type", "Amateur", "Intermediate", "Expert")
+        val birdWatcherAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, birdWatcherTypes)
+        birdWatcherAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        birdWatcherTypeSpinner.adapter = birdWatcherAdapter
+
+        // Set default selection (e.g., first item)
+        birdWatcherTypeSpinner.setSelection(0)
+
+        // Set up the Bird Watching Duration Spinner with default selection
+        val birdWatchingDurations = listOf("Select Duration", "Less than 1 year", "1-5 years", "More than 5 years")
+        val birdWatchingDurationAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, birdWatchingDurations)
+        birdWatchingDurationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        birdWatchingDurationSpinner.adapter = birdWatchingDurationAdapter
+
+        // Set default selection (e.g., first item)
+        birdWatchingDurationSpinner.setSelection(0)
+
         registerButton.setOnClickListener {
             val name = nameInput.text.toString().trim()
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
+            val birdWatcherType = birdWatcherTypeSpinner.selectedItem.toString()
+            val birdWatchingDuration = birdWatchingDurationSpinner.selectedItem.toString()
 
-            if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+            if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() &&
+                birdWatcherType != "Select Type" && birdWatchingDuration != "Select Duration") {
+
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -328,7 +353,9 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
                             val user = hashMapOf(
                                 "userId" to currentUser!!.uid,
                                 "name" to name,
-                                "email" to email
+                                "email" to email,
+                                "birdWatcherType" to birdWatcherType,
+                                "experience" to birdWatchingDuration
                             )
 
                             db.collection("users").document(currentUser!!.uid).set(user, SetOptions.merge())

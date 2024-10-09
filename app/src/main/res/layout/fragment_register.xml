@@ -1,96 +1,127 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.dashboard.RegisterFragment"
-    android:background="@android:color/white">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center"
-        tools:ignore="MissingConstraints">
+        android:layout_margin="8dp"
+        android:elevation="8dp"
+        app:cardCornerRadius="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="32dp"
-            android:textColor="@android:color/black"/>
-
-        <EditText
-            android:id="@+id/nameInput"
-            android:layout_width="350dp"
-            android:layout_height="wrap_content"
-            android:elevation="5dp"
-            android:hint="Full Name"
-            android:padding="16dp"
-            android:background="@drawable/rounded_edittext_background"
-            android:layout_marginBottom="16dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/emailRegisterInput"
-            android:layout_width="350dp"
-            android:layout_height="wrap_content"
-            android:elevation="5dp"
-            android:hint="Email"
-            android:padding="16dp"
-            android:background="@drawable/rounded_edittext_background"
-            android:layout_marginBottom="16dp"
-            android:inputType="textEmailAddress"/>
-
-        <EditText
-            android:id="@+id/passwordRegisterInput"
-            android:layout_width="350dp"
-            android:layout_height="wrap_content"
-            android:elevation="5dp"
-            android:hint="Password"
-            android:padding="16dp"
-            android:background="@drawable/rounded_edittext_background"
-            android:layout_marginBottom="16dp"
-            android:inputType="textPassword"/>
-
-        <Spinner
-            android:id="@+id/birdWatcherTypeSpinner"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_edittext_background"
-            android:elevation="14dp"
-            android:layout_marginBottom="16dp"/>
-
-        <Spinner
-            android:id="@+id/birdWatchingDurationSpinner"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_edittext_background"
-            android:elevation="14dp"
-            android:layout_marginBottom="16dp"/>
-
-        <EditText
-            android:id="@+id/adminPasswordInput"
+        <!-- Two-tone background color -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Admin Password (optional)"
-            android:padding="16dp"
-            android:background="@drawable/rounded_edittext_background"
-            android:layout_marginBottom="16dp"
-            android:inputType="textPassword"/>
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/submitRegisterButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="REGISTER"
-            android:textColor="@android:color/white"
-            android:background="@drawable/rounded_button_background"
-            android:layout_marginBottom="16dp"/>
+            <!-- Top half with a darker color -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/blue_unselected"
+                android:padding="16dp"
+                android:orientation="vertical">
 
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- Title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Register"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Full Name Input -->
+                <EditText
+                    android:id="@+id/nameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Full Name"
+                    android:inputType="text"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:padding="12dp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Email Input -->
+                <EditText
+                    android:id="@+id/emailRegisterInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:padding="12dp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Password Input -->
+                <EditText
+                    android:id="@+id/passwordRegisterInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:padding="12dp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
+
+            <!-- Bottom half with a lighter color for buttons and spinners -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:orientation="vertical">
+
+                <!-- Bird Watcher Type Spinner -->
+                <Spinner
+                    android:id="@+id/birdWatcherTypeSpinner"
+                    android:layout_width="340dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_height="wrap_content"
+                    android:elevation="5dp"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Bird Watching Duration Spinner -->
+                <Spinner
+                    android:id="@+id/birdWatchingDurationSpinner"
+                    android:layout_width="340dp"
+                    android:layout_gravity="center_horizontal"
+                    android:elevation="5dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Admin Password Input -->
+                <EditText
+                    android:id="@+id/adminPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Admin Password (optional)"
+                    android:inputType="textPassword"
+                    android:background="@drawable/rounded_edittext_background"
+                    android:padding="12dp"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Register Button -->
+                <Button
+                    android:id="@+id/submitRegisterButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="REGISTER"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/outdented_button_background"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</ScrollView>
