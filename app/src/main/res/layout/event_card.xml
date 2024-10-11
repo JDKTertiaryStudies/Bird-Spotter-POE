@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:elevation="8dp"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Top half with a darker color (event name, date, and action icons) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/blue_unselected"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+            <!-- Event Name and Date (in the same row) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
+
+                <!-- Event Name -->
+                <TextView
+                    android:id="@+id/eventName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Event Name"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+
+                <!-- Event Date -->
+                <TextView
+                    android:id="@+id/eventDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Date"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:layout_gravity="end" />
+            </LinearLayout>
+
+            <!-- Icons for Calendar Add and More options (left and right) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <!-- Calendar Add Icon on the Left -->
+                <ImageView
+                    android:id="@+id/calendarAddIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_calender"
+                    android:contentDescription="Add To Calender"
+                    android:layout_gravity="start"
+                    android:padding="4dp" />
+
+                <!-- More Icon on the Right -->
+                <ImageView
+                    android:id="@+id/moreIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_more"
+                    android:contentDescription="View More"
+                    android:layout_gravity="end"
+                    android:padding="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Bottom half with a lighter color (event image and location) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:padding="8dp"
+            android:orientation="vertical">
+
+            <!-- Event Image -->
+            <ImageView
+                android:id="@+id/eventImage"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Event Location -->
+            <TextView
+                android:id="@+id/eventLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Event Location"
+                android:textSize="16sp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

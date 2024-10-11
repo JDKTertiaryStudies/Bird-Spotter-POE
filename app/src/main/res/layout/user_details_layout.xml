@@ -6,74 +6,101 @@
     android:layout_marginBottom="3dp"
     android:layout_marginTop="3dp"
     android:layout_gravity="center_horizontal"
-    android:layout_height="370dp"
+    android:layout_height="wrap_content"
     android:layout_margin="16dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    android:backgroundTint="@android:color/white">
+    app:cardElevation="4dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Two-tone background color -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Profile Image with grey border -->
-        <ImageView
-            android:id="@+id/profileImage"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_marginTop="-105dp"
-            android:src="@drawable/ic_user"
-            android:scaleType="centerCrop"
-            android:background="@drawable/gradient_circle_background"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="16dp" />
-
-        <!-- User Name -->
-        <TextView
-            android:id="@+id/userName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="User Name"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@id/profileImage"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:padding="8dp" />
-
-        <!-- LinearLayout for Bird Watcher Type, Experience, and Location -->
+        <!-- Top half with a dark blue background -->
         <LinearLayout
-            android:id="@+id/detailsContainer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            app:layout_constraintTop_toBottomOf="@id/userName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:background="@color/blue_unselected"
+            android:padding="16dp"
+            android:orientation="vertical">
 
-            <!-- Bird Watcher Type -->
+            <!-- Profile Image with grey border -->
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/circle_user"
+                android:scaleType="centerCrop"
+                android:background="@drawable/gradient_circle_background"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="16dp" />
+
+            <!-- User Name -->
             <TextView
-                android:id="@+id/userBirdWatcherType"
+                android:id="@+id/userName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Watch Type"
-                android:textSize="16sp"
-                android:layout_marginEnd="16dp" />
+                android:text="User Name"
+                android:textSize="31sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:textColor="@android:color/white"
+                app:layout_constraintTop_toBottomOf="@id/profileImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:padding="1dp" />
 
-            <!-- Experience -->
-            <TextView
-                android:id="@+id/userBirdWatchingExperience"
+            <!-- Bird Watcher Type and Experience moved under User Name -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Years XP"
-                android:textSize="16sp"
-                android:layout_marginEnd="16dp" />
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="3dp">
+
+                <!-- Bird Watcher Type -->
+                <TextView
+                    android:id="@+id/userBirdWatcherType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Watch Type"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Dash -->
+                <TextView
+                    android:id="@+id/dashLine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="|"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Experience -->
+                <TextView
+                    android:id="@+id/userBirdWatchingExperience"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Years XP"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Bottom half with a lighter color for the details -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:padding="16dp"
+            android:orientation="vertical">
 
             <!-- Location -->
             <TextView
@@ -81,23 +108,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Unknown Location"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textColor="@android:color/black" />
+
+            <!-- Logout Button -->
+            <Button
+                android:id="@+id/logoutButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Logout"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button_background"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="10dp"
+                android:elevation="15dp"
+                android:visibility="gone" />
         </LinearLayout>
-
-        <!-- Logout Button -->
-        <Button
-            android:id="@+id/logoutButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Logout"
-            android:textColor="@android:color/white"
-            android:background="@drawable/rounded_button_background"
-            android:layout_marginTop="8dp"
-            android:elevation="15dp"
-            app:layout_constraintTop_toBottomOf="@id/detailsContainer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:visibility="gone" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

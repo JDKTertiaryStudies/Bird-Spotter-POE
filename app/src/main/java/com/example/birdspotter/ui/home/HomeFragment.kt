@@ -4,10 +4,13 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.birdspotter.R
 import com.example.birdspotter.databinding.FragmentHomeBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -29,6 +33,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -382,11 +387,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     class BirdObservationAdapter(private val observationList: List<BirdObservation>) :
         RecyclerView.Adapter<BirdObservationAdapter.ViewHolder>() {
 
+        private val okHttpClient = OkHttpClient()
+
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val commonName: TextView = view.findViewById(R.id.birdComName)
             val scientificName: TextView = view.findViewById(R.id.birdSciName)
             val location: TextView = view.findViewById(R.id.birdLocation)
             val observationDateTime: TextView = view.findViewById(R.id.birdObsDateTime)
+            val birdBanner: ImageView = view.findViewById(R.id.birdBanner) // ImageView for bird banner
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -401,8 +409,58 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             holder.scientificName.text = observation.scientificName
             holder.location.text = observation.location
             holder.observationDateTime.text = observation.observationDateTime
+
+            // Fetch bird image from SerpAPI based on common name
+            fetchBirdImage(observation.commonName) { imageUrl ->
+                // Make sure to run Glide on the main thread
+                Handler(Looper.getMainLooper()).post {
+                    if (imageUrl != null) {
+                        // Load bird image into ImageView using Glide
+                        Glide.with(holder.itemView.context)
+                            .load(imageUrl)
+                            .placeholder(R.drawable.ic_bird) // Default image if fetching fails
+                            .into(holder.birdBanner)
+                    } else {
+                        // If no image URL is found, display the default bird banner
+                        Glide.with(holder.itemView.context)
+                            .load(R.drawable.ic_bird) // Placeholder image
+                            .into(holder.birdBanner)
+                    }
+                }
+            }
         }
 
         override fun getItemCount(): Int = observationList.size
+
+        // Function to fetch bird image using SerpAPI
+        private fun fetchBirdImage(commonName: String, callback: (String?) -> Unit) {
+            val serpApiKey = "da0aa417177eb602d2fcf8f8ee9d747f17c2cff2ddc91a9a7d90d510db79bd19"
+            val url = "https://serpapi.com/search.json?q=$commonName bird&tbm=isch&ijn=0&api_key=$serpApiKey"
+
+            // Make the network request
+            val request = Request.Builder().url(url).build()
+            okHttpClient.newCall(request).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                    e.printStackTrace()
+                    callback(null)
+                }
+
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                    response.body?.string()?.let { responseBody ->
+                        // Parse the JSON response to get the first image URL
+                        val jsonResponse = JSONObject(responseBody)
+                        val imagesArray = jsonResponse.optJSONArray("images_results")
+
+                        if (imagesArray != null && imagesArray.length() > 0) {
+                            val firstImage = imagesArray.getJSONObject(0)
+                            val imageUrl = firstImage.optString("thumbnail")
+                            callback(imageUrl)
+                        } else {
+                            callback(null) // No image found
+                        }
+                    }
+                }
+            })
+        }
     }
 }

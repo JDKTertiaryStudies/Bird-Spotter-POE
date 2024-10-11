@@ -33,7 +33,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:paddingVertical="10dp"
-                android:text="User"
+                android:text="Profile"
                 android:textSize="16sp"
                 android:textColor="@color/blue_unselected"
                 android:background="@drawable/toggle_unselected"

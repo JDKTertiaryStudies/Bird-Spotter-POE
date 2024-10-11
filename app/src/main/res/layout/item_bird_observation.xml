@@ -26,7 +26,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Common Name"
-                android:textSize="18sp"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white" />
 
@@ -36,7 +37,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Scientific Name"
-                android:textSize="14sp"
+                android:fontFamily="sans-serif-condensed-light"
+                android:textSize="20sp"
                 android:textColor="@android:color/white"
                 android:layout_marginTop="4dp" />
 
@@ -52,9 +54,10 @@
                     android:id="@+id/birdLocation"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed-light"
                     android:layout_weight="1"
                     android:text="Location"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textColor="@android:color/white" />
 
                 <!-- Observation DateTime -->
@@ -62,9 +65,10 @@
                     android:id="@+id/birdObsDateTime"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed-light"
                     android:layout_weight="1"
                     android:text="Observation DateTime"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textColor="@android:color/white"
                     android:layout_gravity="end" />
             </LinearLayout>
@@ -81,12 +85,14 @@
             <!-- Bird Image -->
             <ImageView
                 android:id="@+id/birdBanner"
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_width="380dp"
+                android:layout_height="340dp"
+                android:elevation="10dp"
+                android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_bird"
                 android:contentDescription="Bird Banner"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="5dp" />
 
             <!-- Notes about the observation -->
             <TextView

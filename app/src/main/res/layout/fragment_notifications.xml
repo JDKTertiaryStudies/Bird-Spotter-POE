@@ -4,16 +4,113 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.notifications.NotificationsFragment">
+    tools:context=".ui.taxonomy.BirdTaxonomyFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/notificationsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
+    <!-- Title for Bird Taxonomy -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bird Taxonomy"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Search Bar with rounded corners -->
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_circle_background"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search for birds"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
+
+    <!-- Radio Group for Bird Group Selection -->
+    <RadioGroup
+        android:id="@+id/radioGroupBirdTypes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/search_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5">
+
+        <!-- Common Bird Group Options -->
+        <RadioButton
+            android:id="@+id/rbGroup1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waterfowl"
+            style="@style/RadioButtonStyle" />
+
+        <RadioButton
+            android:id="@+id/rbGroup2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Raptors"
+            style="@style/RadioButtonStyle" />
+
+        <RadioButton
+            android:id="@+id/rbGroup3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Songbirds"
+            style="@style/RadioButtonStyle" />
+
+        <RadioButton
+            android:id="@+id/rbGroup4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shorebirds"
+            style="@style/RadioButtonStyle" />
+
+        <RadioButton
+            android:id="@+id/rbGroup5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Owls"
+            style="@style/RadioButtonStyle" />
+
+        <RadioButton
+            android:id="@+id/rbGroup6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Woodpeckers"
+            style="@style/RadioButtonStyle" />
+
+        <RadioButton
+            android:id="@+id/rbGroup7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Doves"
+            style="@style/RadioButtonStyle" />
+
+        <RadioButton
+            android:id="@+id/rbGroup8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Herons"
+            style="@style/RadioButtonStyle" />
+    </RadioGroup>
+
+    <!-- RecyclerView for Bird Taxonomy Card Views -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/taxonomyRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupBirdTypes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
