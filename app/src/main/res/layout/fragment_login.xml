@@ -5,7 +5,7 @@
     android:padding="16dp">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:elevation="8dp"
@@ -45,7 +45,7 @@
                     android:inputType="textEmailAddress"
                     android:background="@drawable/rounded_edittext_background"
                     android:padding="12dp"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Password Input -->
@@ -57,7 +57,7 @@
                     android:inputType="textPassword"
                     android:background="@drawable/rounded_edittext_background"
                     android:padding="12dp"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:layout_marginBottom="16dp" />
             </LinearLayout>
 

@@ -12,11 +12,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Top section with bird information -->
+        <!-- Top section with bird information and notes with gradient fade -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_dark"
+            android:background="@drawable/top_section_gradient"
             android:padding="16dp"
             android:orientation="vertical">
 
@@ -42,6 +42,16 @@
                 android:textColor="@android:color/white"
                 android:layout_marginTop="4dp" />
 
+            <!-- Observation Notes -->
+            <TextView
+                android:id="@+id/observationNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Notes"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp" />
+
             <!-- Horizontal layout for Location and Observation Date and Time -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -54,7 +64,7 @@
                     android:id="@+id/birdLocation"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed-light"
+                    android:fontFamily="sans-serif-condensed-medium"
                     android:layout_weight="1"
                     android:text="Location"
                     android:textSize="18sp"
@@ -65,7 +75,7 @@
                     android:id="@+id/birdObsDateTime"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed-light"
+                    android:fontFamily="sans-serif-condensed-medium"
                     android:layout_weight="1"
                     android:text="Observation DateTime"
                     android:textSize="18sp"
@@ -74,35 +84,14 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Bottom section with image and additional details -->
-        <LinearLayout
+        <!-- Bottom section with full-covering image -->
+        <ImageView
+            android:id="@+id/birdBanner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_light"
-            android:padding="8dp"
-            android:orientation="vertical">
-
-            <!-- Bird Image -->
-            <ImageView
-                android:id="@+id/birdBanner"
-                android:layout_width="380dp"
-                android:layout_height="340dp"
-                android:elevation="10dp"
-                android:layout_gravity="center"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_bird"
-                android:contentDescription="Bird Banner"
-                android:layout_marginTop="5dp" />
-
-            <!-- Notes about the observation -->
-            <TextView
-                android:id="@+id/observationNotes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Notes"
-                android:textSize="14sp"
-                android:textColor="@android:color/black"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
+            android:layout_height="340dp"
+            android:elevation="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_bird"
+            android:contentDescription="Bird Banner" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
