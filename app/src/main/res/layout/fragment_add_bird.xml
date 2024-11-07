@@ -45,7 +45,7 @@
                     android:inputType="text"
                     android:background="@drawable/rounded_edittext_background"
                     android:padding="12dp"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Bird Notes Input -->
@@ -57,7 +57,7 @@
                     android:inputType="textMultiLine"
                     android:background="@drawable/rounded_edittext_background"
                     android:padding="12dp"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:minLines="3"
                     android:layout_marginBottom="16dp" />
             </LinearLayout>
